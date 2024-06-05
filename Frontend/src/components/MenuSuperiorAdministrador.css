@@ -1,0 +1,64 @@
+#MenuSuperior {      
+    display: inline;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    border: 2px solid rgb(0, 0, 0);
+    background-color: rgb(217, 217, 217);
+}
+
+#botones {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#Nombre {
+    position: absolute;
+    top: 0;
+    padding-left: 170px;
+}
+
+#btn-1 {    
+    height: 80px;
+    width: 150px;
+    border-left: 2px solid rgb(0, 0, 0);
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+    background-color: rgb(217, 217, 217);
+    font-size: 20px;
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: normal;
+}
+
+#btn-1:active {
+    background-color: rgb(96, 65, 51);
+}
+
+#btn-2 {
+    height: 80px;
+    width: 150px;
+    border-left: 2px solid rgb(0, 0, 0);
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+    background-color: rgb(217, 217, 217);
+    font-size: 20px;
+    font-family: "Playfair Display", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: normal;
+}
+
+#btn-2:active {
+    background-color: rgb(96, 65, 51);
+}
+
+.logo {
+    height: 80px;  
+    padding-left: 10px;          
+}
