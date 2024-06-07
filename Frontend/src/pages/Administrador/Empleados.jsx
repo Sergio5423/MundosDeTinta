@@ -5,19 +5,6 @@ import { faTrash, faMagnifyingGlass, faPenToSquare, faFloppyDisk } from "@fortaw
 import { useState, useEffect } from "react"
 import DataTable from "react-data-table-component";
 
-/*function EmpleadosItems({ cedula, nombre, fechaNac, direccion, telefono, departamento }) {
-    return (
-        <article>
-            <p>Cedula: {cedula}</p>
-            <p>Nombre: {nombre}</p>
-            <p>fechaNac: {fechaNac}</p>
-            <p>Direccion: {direccion}</p>
-            <p>Telefono: {telefono}</p>
-            <p>Departamento: {departamento}</p>
-        </article>
-    )
-}
-*/
 const Empleados = () => {
     const [empleados, setEmpleados] = useState([])
 
@@ -25,12 +12,11 @@ const Empleados = () => {
         const allEmpleados = await fetch("http://localhost:3000/empleados")
         const empleadosJson = await allEmpleados.json()
         setEmpleados(empleadosJson.data)
-        console.log(empleadosJson.data)
     }
 
     useEffect(() => {
         getEmpleados()
-    })
+    }, [])
 
     const columns = [
         {
@@ -59,27 +45,7 @@ const Empleados = () => {
         }
     ]
 
-    const data = [
-        {
-			cedula: "10123123",
-			nombre: "us2",
-			fechaNac: "2000-10-30T05:00:00.000Z",
-			direccion: "asdsdas",
-			telefono: "3002541135",
-			Departamento: "contabilidad"
-		},
-		{
-			cedula: "1082833501",
-			nombre: "us1",
-			fechaNac: "2000-10-30T05:00:00.000Z",
-			direccion: "asdsdas",
-			telefono: "3002541135",
-			Departamento: "contabilidad"
-		}
-    ]
-
     return (
-
         <div className="Fondo">
             <MenuSuperiorAdministrador />
             <div id="Panel1">
@@ -94,8 +60,8 @@ const Empleados = () => {
                         </div>
                     </div>
                     <div>
-                        {/*tabla aquí*/}
                         <DataTable
+                            id="tabla"
                             columns={columns}
                             data={empleados}
                         />

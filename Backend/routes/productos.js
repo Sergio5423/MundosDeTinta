@@ -12,6 +12,16 @@ router.get('/', async function(req, res, next) {
   }
 });
 
+/* GET BY ID */
+router.get('/:id', async function(req, res, next) {
+  try {
+    res.json(await productos.getById(req.params.id, req.body));
+  } catch (err) {
+    console.error(`Error al obtener el producto`, err.message);
+    next(err);
+  }
+});
+
 /*POST*/
 router.post('/', async function(req, res, next) {
   try {

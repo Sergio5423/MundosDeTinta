@@ -6,7 +6,7 @@ async function getMultiple(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
     `SELECT p.id, p.nombre, p.cantidad, p.precio_unitario, p.fecha_entrada, c.nombre
-    AS Categoría
+    AS categoria
     FROM productos p 
     INNER JOIN categorias c
     ON p.fk_categorias_id=c.id;`
@@ -17,6 +17,21 @@ async function getMultiple(page = 1) {
   return {
     data,
     meta,
+  };
+}
+
+async function getById(id) {  
+  const row = await db.query(
+    `SELECT p.id, p.nombre, p.precio_unitario, c.nombre
+    AS Categoría
+    FROM productos p 
+    INNER JOIN categorias c
+    ON p.fk_categorias_id=c.id WHERE p.id=${id};`
+  );
+  const data = helper.emptyOrRows(row);
+
+  return {
+    data
   };
 }
 
@@ -69,6 +84,7 @@ async function remove(id) {
 
 module.exports = {
   getMultiple,
+  getById,
   create,
   update,
   remove,

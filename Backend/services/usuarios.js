@@ -1,6 +1,7 @@
 const db = require("./db");
 const helper = require("../helper");
 const config = require("../config");
+const jwt = require("jsonwebtoken");
 /**
  * usamos bcrypt para encriptar la constraseña del usuario y comparar la contraseña encriptada en BD.
  */
@@ -11,11 +12,10 @@ const bcrypt = require("bcrypt");
  * @returns un mensaje si el usuario ha sido creado o no
  */
 async function registrar(usuario) {
-  const plainPassword = bcrypt.hash(usuario.contraseña, 10);
+  const hasedPassword = await bcrypt.hash(user.password, 10);
 
   const result = await db.query(
-    `INSERT INTO usuarios (correo,contraseña) VALUES(?,?)`,
-    [usuario.correo, plainPassword]
+    `INSERT INTO usuarios (correo,contraseña) VALUES('${usuario.correo}','${hasedPassword}')`
   );
   if (!result.affectedRows) {
     return { mensaje: "No se pudo crear el usuario" };
@@ -31,18 +31,30 @@ async function login(usuario) {
   const result = await db.query(
     `SELECT id, correo, contraseña FROM usuarios 
     WHERE correo = ?`,
-    [usuario.correo]  
+    [usuario.correo]
   );
   const dbUser = result[0];
   const mensaje = { mensaje: "Usuario/Contraseña incorrectos" };
   if (!dbUser) {
     return mensaje;
   }
-  let esPasswordValido = bcrypt.compare(usuario.contraseña, dbUser.contraseña);
+
+  const esPasswordValido = await bcrypt.compare(
+    usuario.contraseña,
+    dbUser.contraseña
+  );
   if (!esPasswordValido) {
     return mensaje;
   }
-  return dbUser;
+
+  const token = await jwt.sign(
+    { userId: dbUser.id, userName: dbUser.correo },
+    config.llaveSecreta,
+    {
+      expiresIn: "15m",
+    }
+  );
+  return token;
 }
 
 module.exports = {

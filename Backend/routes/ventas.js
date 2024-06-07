@@ -12,6 +12,36 @@ router.get('/', async function(req, res, next) {
   }
 });
 
+/* GET  INGRESOS*/
+router.get('/ingresos', async function(req, res, next) {
+  try {
+    res.json(await ventas.getIngresos(req.query.page));
+  } catch (err) {
+    console.error(`Error al obtener los ingresos`, err.message);
+    next(err);
+  }
+});
+
+/* GET  PAGOS */
+router.get('/pagos', async function(req, res, next) {
+  try {
+    res.json(await ventas.getPagos(req.query.page));
+  } catch (err) {
+    console.error(`Error al obtener los pagos`, err.message);
+    next(err);
+  }
+});
+
+/* GET MAS VENDIDOS */
+router.get('/MasVendidos', async function(req, res, next) {
+  try {
+    res.json(await ventas.getMasVendidos(req.query.page));
+  } catch (err) {
+    console.error(`Error al obtener los productos más vendidos`, err.message);
+    next(err);
+  }
+});
+
 /*POST*/
 router.post('/', async function(req, res, next) {
   try {
