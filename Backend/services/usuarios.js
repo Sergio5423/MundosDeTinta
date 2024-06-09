@@ -12,7 +12,7 @@ const bcrypt = require("bcrypt");
  * @returns un mensaje si el usuario ha sido creado o no
  */
 async function registrar(usuario) {
-  const hasedPassword = await bcrypt.hash(user.password, 10);
+  const hasedPassword = await bcrypt.hash(usuario.password, 10);
 
   const result = await db.query(
     `INSERT INTO usuarios (correo,contraseña) VALUES('${usuario.correo}','${hasedPassword}')`

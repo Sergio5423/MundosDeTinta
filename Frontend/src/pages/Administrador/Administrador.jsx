@@ -5,6 +5,11 @@ import logo from "../../design/Logo.png";
 import MenuSuperiorAdministrador from "../../components/MenuSuperiorAdministrador";
 import { useState, useEffect } from "react"
 import DataTable from "react-data-table-component";
+import { Bar, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, LinearScale, CategoryScale, BarController, BarElement, PieController, ArcElement } from 'chart.js';
+
+ChartJS.register(BarController, BarElement, CategoryScale, LinearScale, PieController, ArcElement);
+
 
 let Ingresos;
 
@@ -15,7 +20,6 @@ const Administrador = () => {
     const [ventas, setVentas] = useState([])
     const [pagos, setPagos] = useState([])
     const [masvendidos, setMasvendidos] = useState([])
-
 
     const getEmpleados = async () => {
         const allEmpleados = await fetch("http://localhost:3000/empleados")
@@ -46,6 +50,41 @@ const Administrador = () => {
         const ingresosJson = await ingresos.json()
         Ingresos = ingresosJson.data[0].Ingresos
     }
+
+    const data = {
+        labels: masvendidos.map(item => item.ProductoNombre),
+        datasets: [
+            {
+                //label: '# of Votes',
+                data: masvendidos.map(item => item.vecesvendido),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    const options = {
+        scales: {
+            y: {
+                beginAtZero: true,
+            },
+        },
+    };
 
     useEffect(() => {
         getEmpleados()
@@ -157,7 +196,7 @@ const Administrador = () => {
                     />
                 </div>
                 <div id="dv">
-                    <h2 id="txt-ingresos">Productos más vendidos</h2>                    
+                    <h2 id="txt-ingresos">Productos más vendidos</h2>
                     <DataTable
                         columns={columnsMasVendidos}
                         data={masvendidos}
@@ -166,10 +205,7 @@ const Administrador = () => {
                     />
                     <p>Ingresos Totales: ${Ingresos}</p>
                 </div>
-                <div id="dv">
-                    <h2>Ventas</h2>
-                    {/*Grafica aquí*/}
-                </div>
+                
             </div>
             <div id="Panel">
                 <div id="dv-tabla">
@@ -191,9 +227,16 @@ const Administrador = () => {
                         paginationPerPage={3}
                     />
                 </div>
+
+            </div>
+            <div id="Panel">
                 <div id="dv">
                     <h2>Ventas</h2>
-                    {/*Grafica aquí*/}
+                    <Bar data={data} options={options} />
+                </div>
+                <div id="dv">
+                    <h2>Ventas</h2>
+                    <Pie id="graph" data={data} options={options} />
                 </div>
             </div>
         </div>
