@@ -35,7 +35,7 @@ router.post('/', async function(req, res, next) {
 /* PUT */
 router.put('/:id', async function(req, res, next) {
   try {
-    res.json(await productos.update(req.params.id, req.body));
+    res.json(await productos.update(req.params.id));
   } catch (err) {
     console.error(`Error al actualizar el producto`, err.message);
     next(err);

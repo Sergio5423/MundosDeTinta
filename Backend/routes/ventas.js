@@ -43,9 +43,9 @@ router.get('/MasVendidos', async function(req, res, next) {
 });
 
 /*POST*/
-router.post('/nuevaVenta/:id/:cedula/:facturaId', async function(req, res, next) {
+router.post('/nuevaVenta/:id', async function(req, res, next) {
   try {
-    res.json(await ventas.create(req.params.id,req.params.cedula,req.params.facturaId));
+    res.json(await ventas.create(req.params.id,req.body));
   } catch (err) {
     console.error(`Error al agregar la venta`, err.message);
     next(err);

@@ -78,7 +78,7 @@ async function getMasVendidos(page = 1) {
   };
 }
 
-async function create(id, cedula, facturaId) {
+async function create(id, venta) {
   const fechaActual = new Date();
   const año = fechaActual.getFullYear();
   const mes = fechaActual.getMonth() + 1;
@@ -88,7 +88,7 @@ async function create(id, cedula, facturaId) {
     `INSERT INTO ventas 
     (fecha,fk_empleados_cedula,id_factura,fk_productos_id)
     VALUES
-    ("${fechaFormateada}","${cedula}","${facturaId}",${id});`
+    ("${fechaFormateada}","${venta.cedula}","${venta.facturaId}",${id});`
   );
 
   let message = "Error al agregar la venta";

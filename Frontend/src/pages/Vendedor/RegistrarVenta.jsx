@@ -12,7 +12,7 @@ const RegistrarVenta = () => {
     const [id, setId] = useState('')
     const [cedula, setCedula] = useState('')
     const [facturaId, setFacturaId] = useState('')
-
+    const [dataForm, SetDataForm] = useState({})
 
     const getProductos = async () => {
         const allProductos = await fetch("http://localhost:3000/productos")
@@ -20,19 +20,38 @@ const RegistrarVenta = () => {
         setProductos(productosJson.data)
     }
 
-    const handlerBuyButton = async (e, id, cedula, facturaId) => {
-        e.preventDefault();
-        await fetch(`http://localhost:3000/ventas/nuevaVenta/${id}/${cedula}/${facturaId}`, {
-            method: "POST"
+    const handlerBuy = async (e, id) => {
+        e.preventDefault();       
+        await fetch(`http://localhost:3000/ventas/nuevaVenta/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dataForm)
+            
         })
+        await fetch(`http://localhost:3000/productos/${id}`, {
+            method: "PUT",
+        })
+        getProductos();
     }
 
+    const handlerFormInput = (e) => {
+        SetDataForm(
+            {
+                ...dataForm,
+                [e.target.name]: e.target.value
+            }
+        )
+    }
 
     useEffect(() => {
         let numeroAleatorio = Math.floor(Math.random() * 9000000000) + 1000000000;
-        setFacturaId(numeroAleatorio);
+        numeroAleatorio = numeroAleatorio.toString()
+        SetDataForm(prevDataForm => ({ ...prevDataForm, facturaId: numeroAleatorio }));
         getProductos()
     }, [])
+    
 
     const columns = [
         {
@@ -42,6 +61,10 @@ const RegistrarVenta = () => {
         {
             name: "Nombre",
             selector: row => row.nombre
+        },
+        {
+            name: "Cantidad",
+            selector: row => row.cantidad
         },
         {
             name: "Precio Unitario",
@@ -58,12 +81,13 @@ const RegistrarVenta = () => {
             <MenuSuperiorVendedor />
             <div id="Panel1">
                 <div id="contenedor1">
-                    <form onSubmit={(e) => handlerBuyButton(e, id, cedula, facturaId)}>
+                    <form onSubmit={(e) => handlerBuy(e, id)}>
                         <div id="top">
                             <h1 id="txt1">Productos</h1>
 
                             <div>
-                                <input id="tb-Buscar" type="text" value={cedula} onChange={(e) => setCedula(e.target.value)} placeholder="Cedula Empleado"></input>
+                                <input id="tb-Buscar" type="text" value={dataForm.cedula} onChange={handlerFormInput}  name="cedula" placeholder="Cedula Empleado"></input>
+
                                 <input id="tb-Buscar" type="text" value={id} onChange={(e) => setId(e.target.value)}></input>
                                 <button id="btn-Buscar">
                                     <FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#dce1e5", }} />

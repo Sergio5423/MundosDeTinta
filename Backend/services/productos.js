@@ -20,7 +20,7 @@ async function getMultiple(page = 1) {
   };
 }
 
-async function getById(id) {  
+async function getById(id) {
   const row = await db.query(
     `SELECT p.id, p.nombre, p.precio_unitario, c.nombre
     AS Categoría
@@ -31,7 +31,7 @@ async function getById(id) {
   const data = helper.emptyOrRows(row);
 
   return {
-    data
+    data,
   };
 }
 
@@ -52,26 +52,29 @@ async function create(producto) {
   return { message };
 }
 
-async function update(id, producto) {
-  const result = await db.query(
-    `UPDATE productos 
-    SET nombre="${producto.nombre}", cantidad=${producto.cantidad}, precio_unitario=${producto.precio_unitario}, fecha_entrada ='${producto.fecha_entrada}', fk_categorias_id=${producto.fk_categorias_id}
-    WHERE id=${id};`
-  );
+async function update(id) {
+  let data = await db.query(
+    `SELECT cantidad FROM productos WHERE id=${id}`
+  );  
+  let valor = data[0].cantidad  
+  if (valor > 0) {
+    const result = await db.query(
+      `UPDATE productos 
+      SET cantidad=cantidad-1
+      WHERE id=${id};`
+    );
 
-  let message = "Error al actualizar el producto";
-
-  if (result.affectedRows) {
     message = "Producto actualizado";
-  }
 
-  return { message };
+    return { message };
+  } else {
+    let message = "Error al actualizar el producto";
+    return { message };
+  }
 }
 
 async function remove(id) {
-  const result = await db.query(
-    `DELETE FROM productos WHERE id=${id}`
-  );
+  const result = await db.query(`DELETE FROM productos WHERE id=${id}`);
 
   let message = "Error al eliminar el producto";
 
