@@ -12,6 +12,16 @@ router.get('/', async function(req, res, next) {
   }
 });
 
+/* GET NOMBRES */
+router.get('/nombres', async function(req, res, next) {
+  try {
+    res.json(await departamentos.getNombres(req.query.page));
+  } catch (err) {
+    console.error(`Error al cargar los nombres`, err.message);
+    next(err);
+  }
+});
+
 /* POST */
 router.post('/', async function(req, res, next) {
   try {

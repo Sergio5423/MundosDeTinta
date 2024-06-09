@@ -40,7 +40,7 @@ async function create(producto) {
     `INSERT INTO productos 
     (nombre,cantidad,precio_unitario,fecha_entrada,fk_categorias_id)
     VALUES
-    ("${producto.nombre}",${producto.cantidad},${producto.precio_unitario},'${producto.fecha_entrada}',${producto.fk_categorias_id});`
+    ("${producto.nombre}",${producto.cantidad},${producto.precio_unitario},'${producto.fecha_entrada}',(SELECT id FROM categorias WHERE nombre="${producto.Cnombre}"));`
   );
 
   let message = "Error al agregar el producto";

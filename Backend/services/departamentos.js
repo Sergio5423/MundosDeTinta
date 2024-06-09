@@ -17,6 +17,21 @@ async function getMultiple(page = 1) {
   };
 }
 
+async function getNombres(page = 1) {
+  const offset = helper.getOffset(page, config.listPerPage);
+  const rows = await db.query(
+    `SELECT nombre
+    FROM departamentos`
+  );
+  const data = helper.emptyOrRows(rows);
+  const meta = { page };
+
+  return {
+    data,
+    meta,
+  };
+}
+
 async function create(departamento) {
   const result = await db.query(
     `INSERT INTO departamentos 
@@ -64,6 +79,7 @@ async function remove(id) {
 
 module.exports = {
   getMultiple,
+  getNombres,
   create,
   update,
   remove,

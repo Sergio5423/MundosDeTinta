@@ -10,11 +10,19 @@ import DataTable from "react-data-table-component";
 const Departamentos = () => {
 
     const [departamento, setDepartamentos] = useState([])
+    const [id, setId] = useState('')
 
     const getDepartamentos = async () => {
         const allDepartamentos = await fetch("http://localhost:3000/departamentos")
         const departamentosJson = await allDepartamentos.json()
         setDepartamentos(departamentosJson.data)
+    }
+    
+    const handlerDeleteButton = async (id) => {        
+        await fetch(`http://localhost:3000/departamentos/${id}`, {
+            method: "DELETE"
+        })
+        getDepartamentos();
     }
 
     useEffect(() => {
@@ -44,10 +52,10 @@ const Departamentos = () => {
                     <div id="top">
                         <h1 id="txt1">Departamentos</h1>
                         <div>
-                            <input id="tb-Buscar"></input> {/*Cambiar tb buscar por combo box departamento*/}
-                            <button id="btn-Buscar">
-                                <FontAwesomeIcon icon={faMagnifyingGlass} style={{ color: "#dce1e5", }} />
-                            </button> {/*cambiar btn buscar por btn agregar*/}
+                            <input id="tb-Eliminar" type="text" value={id} onChange={(e) => setId(e.target.value)}></input>
+                            <button id="btn-Inf" onClick={() => handlerDeleteButton(id)}>
+                                <FontAwesomeIcon icon={faTrash} style={{ color: "#dce1e5", }} />
+                            </button>
                         </div>
                     </div>
                     <div>
@@ -55,17 +63,16 @@ const Departamentos = () => {
                             id="tabla"
                             columns={columns}
                             data={departamento}
+                            pagination
+                            paginationPerPage={5}
                         />
                     </div>
                     <div id="bottom">
                         <div>
-                            <button id="btn-Inf">
-                                <FontAwesomeIcon icon={faTrash} style={{ color: "#dce1e5", }} />
-                            </button>
-                            <button id="btn-Inf">
+                            <button id="btn-Inf" onClick={() => redireccion("/administrador/departamentos/actualizarDepartamento")}>
                                 <FontAwesomeIcon icon={faPenToSquare} style={{ color: "#dce1e5", }} />
                             </button>
-                            <button id="btn-Inf">
+                            <button id="btn-Inf" onClick={() => redireccion("/administrador/departamentos/registrarDepartamento")}>
                                 <FontAwesomeIcon icon={faFloppyDisk} style={{ color: "#dce1e5", }} />
                             </button>
                         </div>

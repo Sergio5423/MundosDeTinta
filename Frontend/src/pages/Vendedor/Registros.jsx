@@ -67,6 +67,8 @@ const Registros = () => {
                         <DataTable
                             columns={columns}
                             data={ventas}
+                            pagination
+                            paginationPerPage={5}
                         />
                     </div>
                 </div>

@@ -25,7 +25,7 @@ async function create(empleado){
     `INSERT INTO empleados 
     (cedula,nombre,fechaNac,direccion,telefono,fk_departamentos_id)
     VALUES
-    ("${empleado.cedula}","${empleado.nombre}",'${empleado.fechaNac}',"${empleado.direccion}","${empleado.telefono}",${empleado.fk_departamentos_id});`
+    ("${empleado.cedula}","${empleado.nombre}",'${empleado.fechaNac}',"${empleado.direccion}","${empleado.telefono}",(SELECT id FROM departamentos WHERE nombre="${empleado.Dnombre}"));`
   );
 
   let message = 'Error al agregar el empleado';
