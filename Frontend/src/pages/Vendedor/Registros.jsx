@@ -13,6 +13,7 @@ const Registros = () => {
     const getVentas = async () => {
         const allVentas = await fetch("http://localhost:3000/ventas")
         const ventasJson = await allVentas.json()
+        console.log(ventasJson.data)
         setVentas(ventasJson.data)
     }
 

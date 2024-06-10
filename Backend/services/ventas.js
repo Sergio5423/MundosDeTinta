@@ -1,8 +1,55 @@
 const db = require("./db");
 const helper = require("../helper");
 const config = require("../config");
+const sequelize = require("../config-db");
+const initModels = require("../models/init-models");
+const models = initModels(sequelize);
 
+/*--------------------------------------------------------------------*/
 async function getMultiple(page = 1) {
+  const offset = helper.getOffset(page, config.listPerPage);
+
+  const ventas = await models.ventas.findAll({
+    attributes: ["id", "fecha", "id_factura"],
+    include: [
+      {
+        model: models.empleados,
+        attributes: ["cedula", "nombre"],
+        as: "fk_empleados_cedula_empleado",
+      },
+      {
+        model: models.productos,
+        attributes: ["nombre", "precio_unitario"],
+        as: "fk_producto",
+      },
+    ],
+    offset: offset,
+    limit: config.listPerPage,
+  });
+
+  const data = ventas.map((venta) => {
+    const ventaJSON = venta.toJSON();
+    return {
+      id: ventaJSON.id,
+      fecha: ventaJSON.fecha,
+      id_factura: ventaJSON.id_factura,
+      cedula: ventaJSON.fk_empleados_cedula_empleado.cedula,
+      nombreEmpleado: ventaJSON.fk_empleados_cedula_empleado.nombre,
+      nombreProducto: ventaJSON.fk_producto.nombre,
+      precio_unitario: ventaJSON.fk_producto.precio_unitario,
+    };
+  });
+  const meta = { page };
+
+  return {
+    data,
+    meta,
+  };
+}
+
+/*--------------------------------------------------------------------*/
+
+/*async function getMultiple(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
     `SELECT v.id, v.fecha, e.cedula, e.nombre AS nombreEmpleado, v.id_factura, p.nombre AS nombreProducto, p.precio_unitario
@@ -21,9 +68,40 @@ async function getMultiple(page = 1) {
     data,
     meta,
   };
+}*/
+
+/*-----------------------------------------------------------------*/
+async function getIngresos(page = 1) {
+  const offset = helper.getOffset(page, config.listPerPage);
+  const ingresos = await models.ventas.findAll({
+    attributes: [
+      [
+        sequelize.fn("SUM", sequelize.col("fk_producto.precio_unitario")),
+        "Ingresos",
+      ],
+    ],
+    include: [
+      {
+        model: models.productos,
+        as: "fk_producto",
+        attributes: [],
+      },
+    ],
+    raw: true,
+  });
+
+  const data = helper.emptyOrRows(ingresos);
+  const meta = { page };
+
+  return {
+    data,
+    meta,
+  };
 }
 
-async function getIngresos(page = 1) {
+/*-----------------------------------------------------------------*/
+
+/*async function getIngresos(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
     `SELECT SUM(p.precio_unitario) AS Ingresos
@@ -39,7 +117,7 @@ async function getIngresos(page = 1) {
     data,
     meta,
   };
-}
+}*/
 
 async function getPagos(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
@@ -78,12 +156,48 @@ async function getMasVendidos(page = 1) {
   };
 }
 
+/*----------------------------------------------*/
 async function create(id, venta) {
   const fechaActual = new Date();
   const año = fechaActual.getFullYear();
   const mes = fechaActual.getMonth() + 1;
   const dia = fechaActual.getDate();
-  const fechaFormateada = `${año}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+  const fechaFormateada = `${año}-${mes.toString().padStart(2, "0")}-${dia
+    .toString()
+    .padStart(2, "0")}`;
+
+  const nuevaVenta = {
+    fecha: fechaFormateada,
+    fk_empleados_cedula: venta.cedula,
+    id_factura: venta.facturaId,
+    fk_productos_id: id
+  };
+
+  let message = "Error al agregar la venta";
+
+  try {
+    const result = await models.ventas.create(nuevaVenta);
+    if (result) {
+      message = "Venta agregada";
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  return { message };
+}
+
+/*----------------------------------------------*/
+
+
+/*async function create(id, venta) {
+  const fechaActual = new Date();
+  const año = fechaActual.getFullYear();
+  const mes = fechaActual.getMonth() + 1;
+  const dia = fechaActual.getDate();
+  const fechaFormateada = `${año}-${mes.toString().padStart(2, "0")}-${dia
+    .toString()
+    .padStart(2, "0")}`;
   const result = await db.query(
     `INSERT INTO ventas 
     (fecha,fk_empleados_cedula,id_factura,fk_productos_id)
@@ -98,9 +212,9 @@ async function create(id, venta) {
   }
 
   return { message };
-}
+}*/
 
-async function update(id, venta) {
+/*async function update(id, venta) {
   const result = await db.query(
     `UPDATE ventas 
     SET fecha='${venta.fecha}', fk_empleados_cedula="${venta.fk_empleados_cedula}", id_factura="${venta.id_factura}", fk_productos_id=${venta.fk_productos_id}
@@ -114,9 +228,25 @@ async function update(id, venta) {
   }
 
   return { message };
-}
+}*/
 
+/*---------------------------------------------------------*/
 async function remove(id) {
+  const result = await models.ventas.destroy({
+    where: { id: id }
+  });
+
+  let message = "Error al eliminar la venta";
+
+  if (result) {
+    message = "Venta eliminada";
+  }
+
+  return { message };
+}
+/*---------------------------------------------------------*/
+
+/*async function remove(id) {
   const result = await db.query(`DELETE FROM ventas WHERE id=${id}`);
 
   let message = "Error al eliminar la venta";
@@ -126,12 +256,11 @@ async function remove(id) {
   }
 
   return { message };
-}
+}*/
 
 module.exports = {
   getMultiple,
   create,
-  update,
   remove,
   getIngresos,
   getPagos,

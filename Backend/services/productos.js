@@ -1,8 +1,37 @@
 const db = require("./db");
 const helper = require("../helper");
 const config = require("../config");
+const sequelize = require("../config-db");
+const initModels = require("../models/init-models");
+const models = initModels(sequelize);
 
+/*---------------------------------------------------------------------*/
 async function getMultiple(page = 1) {
+  const offset = helper.getOffset(page, config.listPerPage);
+  
+  const data = await models.productos.findAll({
+    attributes: ['id', 'nombre', 'cantidad', 'precio_unitario', 'fecha_entrada', [sequelize.col('fk_categoria.nombre'), 'categoria']],
+    include: [{
+      model: models.categorias,
+      as: 'fk_categoria',
+      attributes: [],
+      required: true
+    }],
+    offset: offset,
+    limit: config.listPerPage
+  });
+
+  const meta = { page };
+
+  return {
+    data,
+    meta,
+  };
+}
+
+/*---------------------------------------------------------------------*/
+
+/*async function getMultiple(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
     `SELECT p.id, p.nombre, p.cantidad, p.precio_unitario, p.fecha_entrada, c.nombre
@@ -18,9 +47,35 @@ async function getMultiple(page = 1) {
     data,
     meta,
   };
+}*/
+
+/*-------------------------------------------------------------*/
+async function getById(id) {
+  const producto = await models.productos.findOne({
+    where: { id: id },
+    include: [{
+      model: models.categorias,
+      as: 'fk_categoria',
+      attributes: ['nombre']
+    }],
+    attributes: ['id', 'nombre', 'precio_unitario']
+  });
+
+  if (!producto) {
+    return { data: [] };
+  }
+
+  const data = producto.toJSON();
+
+  data['Categoría'] = data.fk_categoria.nombre;
+  delete data.fk_categoria; 
+
+  return { data };
 }
 
-async function getById(id) {
+/*-------------------------------------------------------------*/
+
+/*async function getById(id) {
   const row = await db.query(
     `SELECT p.id, p.nombre, p.precio_unitario, c.nombre
     AS Categoría
@@ -33,9 +88,40 @@ async function getById(id) {
   return {
     data,
   };
+}*/
+
+/*---------------------------------------------------------------------*/
+async function create(producto) {
+  const categoria = await models.categorias.findOne({
+    where: { nombre: producto.Cnombre }
+  });
+
+  if (!categoria) {
+    return { message: "Categoría no encontrada" };
+  }
+
+  const nuevoProducto = {
+    nombre: producto.nombre,
+    cantidad: producto.cantidad,
+    precio_unitario: producto.precio_unitario,
+    fecha_entrada: producto.fecha_entrada,
+    fk_categorias_id: categoria.id
+  };
+
+  const result = await models.productos.create(nuevoProducto);
+
+  let message = "Error al agregar el producto";
+
+  if (result) {
+    message = "Producto agregado";
+  }
+
+  return { message };
 }
 
-async function create(producto) {
+/*---------------------------------------------------------------------*/
+
+/*async function create(producto) {
   const result = await db.query(
     `INSERT INTO productos 
     (nombre,cantidad,precio_unitario,fecha_entrada,fk_categorias_id)
@@ -50,9 +136,34 @@ async function create(producto) {
   }
 
   return { message };
+}*/
+
+/*------------------------------------------------------*/
+async function update(id) {
+
+  const producto = await models.productos.findOne({
+    where: { id: id }
+  });
+
+  if (!producto) {
+    return { message: "Producto no encontrado" };
+  }
+
+
+  if (producto.cantidad > 0) {
+
+    producto.cantidad -= 1;
+    await producto.save();
+
+    return { message: "Producto actualizado" };
+  } else {
+    return { message: "Error al actualizar el producto" };
+  }
 }
 
-async function update(id) {
+/*------------------------------------------------------*/
+
+/*async function update(id) {
   let data = await db.query(
     `SELECT cantidad FROM productos WHERE id=${id}`
   );  
@@ -71,9 +182,26 @@ async function update(id) {
     let message = "Error al actualizar el producto";
     return { message };
   }
-}
+}*/
 
+/*-------------------------------------------------------------------*/
 async function remove(id) {
+
+  const producto = await models.productos.findOne({
+    where: { id: id }
+  });
+
+  if (!producto) {
+    return { message: "Producto no encontrado" };
+  }
+
+  await producto.destroy();
+
+  return { message: "Producto eliminado" };
+}
+/*-------------------------------------------------------------------*/
+
+/*async function remove(id) {
   const result = await db.query(`DELETE FROM productos WHERE id=${id}`);
 
   let message = "Error al eliminar el producto";
@@ -83,7 +211,7 @@ async function remove(id) {
   }
 
   return { message };
-}
+}*/
 
 module.exports = {
   getMultiple,

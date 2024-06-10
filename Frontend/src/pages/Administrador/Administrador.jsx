@@ -170,7 +170,7 @@ const Administrador = () => {
         },
         {
             name: "Nombre",
-            selector: row => row.nombre
+            selector: row => row.nombreEmpleado
         },
         {
             name: "Pago",
