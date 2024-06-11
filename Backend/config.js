@@ -7,7 +7,7 @@ const config = {
     connectTimeout: 60000,
     
   },
-  listPerPage: 10,
+  listPerPage: 100,
   llaveSecreta: "a"
 };
 module.exports = config;
