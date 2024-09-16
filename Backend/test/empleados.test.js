@@ -3,7 +3,7 @@ const emp = require("../services/empleados");
 test("Cargar empleados", async () => {
     await expect(emp.getMultiple()).resolves.toBeTruthy();
 });
-/*
+
 test("Agrega el empleado", async () => {
     var empleado = {
         cedula: "1",
@@ -30,4 +30,4 @@ test ("Modificar Empleado", async () => {
 
 test("Remover empleado", async () => {
     await expect(emp.remove("1")).resolves.toBeTruthy();
-});*/
+});
