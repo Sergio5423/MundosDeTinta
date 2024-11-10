@@ -33,27 +33,13 @@ router.post('/', async function(req, res, next) {
 });
 
 /* PUT */
-router.put('/:id', async function(req, res, next) {
-  try {
-    const { id } = req.params;
-    const { cantidad } = req.body;
-    console.log("Cantidad Id: ",id);
-    console.log("Cantidad Ruta: ",cantidad)
-    /*if (id || cantidad === undefined) {
-      res.status(400).json({ message: "Faltan datos necesarios para actualizar el producto" });
-      return;
-    }*/
-
-    const result = await productos.update(id,cantidad);
-    return result;
-    /*if (result.message === "Producto actualizado") {
-      res.json(result);
-    } else {
-      res.status(404).json(result);
-    }*/
+router.put('/actualizar', async function(req, res, next) {
+  try {    
+    const result = await productos.update(req.body);
+    res.json(result);
   } catch (err) {
-    console.error(`Error al actualizar el producto`, err.message);
-    next(err);
+    //console.error(`Error al agregar la venta`, err.message);
+    //res.status(500).send(err.message);
   }
 });
 

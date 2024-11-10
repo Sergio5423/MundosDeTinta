@@ -168,7 +168,7 @@ async function create(ventas) {
   let message = "Error al agregar las ventas";
   let ventasCreadas = 0;
 
-  try {
+  //try {
     // Verificar los datos de entrada
     if (!Array.isArray(ventas.productos) || !ventas.ced_empleado || !ventas.ced_cliente || !ventas.facturaId) {
       throw new Error("Datos de entrada inválidos");
@@ -184,25 +184,24 @@ async function create(ventas) {
         cantidad: producto.cantidad
       };
 
-      // Agregar mensaje de consola para mostrar nuevaVenta
-      console.log("Nueva Venta:", nuevaVenta);
+      //console.log("Nueva Venta:", nuevaVenta);
 
       const result = await db.query(`INSERT INTO ventas (fecha, fk_empleados_cedula, fk_productos_id, ced_cliente, cantidad) VALUES 
                                     ("${fechaFormateada}", "${nuevaVenta.fk_empleados_cedula}", ${nuevaVenta.fk_productos_id}, "${nuevaVenta.ced_cliente}", "${nuevaVenta.cantidad}");`);
-      if (result) {
+   //   if (result) {
         ventasCreadas++;
-      }
-    }
+  //    }
+  //  }
 
-    if (ventasCreadas > 0) {
-      message = `${ventasCreadas} ventas agregadas`;
-    }
-  } catch (error) {
-    console.error("Error al agregar las ventas", error.message);
-    return { message: error.message };
+  //  if (ventasCreadas > 0) {
+ //     message = `${ventasCreadas} ventas agregadas`;
+  //  }
+  //} catch (error) {
+  //  console.error("Error al agregar las ventas", error.message);
+  //  return { message: error.message };
   }
 
-  return { message };
+  //return { message };
 }
 
 

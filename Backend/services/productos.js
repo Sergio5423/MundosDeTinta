@@ -172,34 +172,40 @@ async function create(producto) {
 
 /*------------------------------------------------------*/
 
-async function update(id, cantidad) {
-  
-  console.log("Cantidad Servicio: ",cantidad);
+async function update(ventas) {  
 
-  // Obtener la cantidad actual del producto
-  let data = await db.query(`SELECT cantidad FROM productos WHERE id=${id}`);
+  //let data = await db.query(`SELECT cantidad FROM productos WHERE id=${id}`);
   
   // Verificar si el producto existe
-  if (data.length === 0) {
+  /*if (data.length === 0) {
     return { message: "Producto no encontrado" };
-  }
+  }*/
 
-  let valor = data[0].cantidad;
+  //let valor = data[0].cantidad;
   
   // Verificar si hay suficiente cantidad para actualizar
-  if (valor > 0 && valor >= cantidad) {
+  /*if (valor > 0 && valor >= cantidad) {*/
+  for (const producto of ventas.productos) {
+    const nuevaAct = {
+      id: producto.id,
+      cantidad: producto.cantidad
+    };
+    console.log(nuevaAct.id);
+    console.log(nuevaAct.cantidad);
     const result = await db.query(
       `UPDATE productos 
-       SET cantidad=cantidad-${cantidad}
-       WHERE id=${id};`
+       SET cantidad=cantidad-${nuevaAct.cantidad}
+       WHERE id=${nuevaAct.id};`
     );
+  }
+    
 
     let message = "Producto actualizado";
     return { message };
-  } else {
-    let message = "Cantidad insuficiente para actualizar el producto";
-    return { message };
-  }
+  /*} else {*/
+    /*let message = "Cantidad insuficiente para actualizar el producto";
+    return { message };*/
+  /*}*/
 }
 
 

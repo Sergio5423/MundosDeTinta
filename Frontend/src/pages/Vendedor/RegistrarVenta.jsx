@@ -30,21 +30,21 @@ const RegistrarVenta = () => {
       id: row.id,
       cantidad: selectedQuantities[row.id] || 1, // Default to 1 if no quantity selected
     }));
-  
+
     if (!cedulaEmpleado || !cedulaCliente || selectedProducts.length === 0) {
-      alert("Por favor, completa todos los campos y selecciona al menos un producto.");
+      alert(
+        "Por favor, completa todos los campos y selecciona al menos un producto."
+      );
       return;
     }
-  
+
     const payload = {
       ced_empleado: cedulaEmpleado,
       ced_cliente: cedulaCliente,
       productos: selectedProducts,
       facturaId: dataForm.facturaId,
     };
-  
-    //console.log(payload); // Verificar el payload en la consola
-  
+
     if (window.confirm("¿Estás seguro de que deseas registrar esta venta?")) {
       const response = await fetch(`http://localhost:3000/ventas/nuevaVenta`, {
         method: "POST",
@@ -53,25 +53,29 @@ const RegistrarVenta = () => {
         },
         body: JSON.stringify(payload),
       });
-  
-      if (response.ok) {
-        for (const product of selectedProducts) {
-          await fetch(`http://localhost:3000/productos/${product.id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ cantidad: product.cantidad }),
-          });
+
+      let allUpdatesSuccess = true;
+      let updateMessages = [];
+
+      const updateResponse = await fetch(`http://localhost:3000/productos/actualizar`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         }
-          
-        alert("¡Venta registrada exitosamente!");
-      } else {
-        alert("Error al registrar la venta");
+      );
+
+      getProductos();
+      if (allUpdatesSuccess) {
+        alert(`¡Venta registrada exitosamente!\n${updateMessages.join("\n")}`);
       }
+
+      const result = await response.json();
+      alert(`Error al registrar la venta: ${result.message}`);
     }
   };
-  
 
   const handlerFormInput = (e) => {
     setDataForm({
@@ -120,6 +124,10 @@ const RegistrarVenta = () => {
           onChange={(e) => handleQuantityChange(row.id, e.target.value)}
         />
       ),
+    },
+    {
+      name: "Disponible",
+      selector: (row) => row.cantidad,
     },
     {
       name: "Precio Unitario",
