@@ -2,7 +2,11 @@ import MenuSuperiorVendedor from "../../components/MenuSuperiorVendedor";
 import logo from "../../design/Logo.png";
 import "../../design/Vendedor/RegistrarVenta.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faMagnifyingGlass, faCashRegister } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTrash,
+  faMagnifyingGlass,
+  faCashRegister,
+} from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 
@@ -39,7 +43,7 @@ const RegistrarVenta = () => {
       facturaId: dataForm.facturaId,
     };
   
-    console.log(payload); // Verificar el payload en la consola
+    //console.log(payload); // Verificar el payload en la consola
   
     if (window.confirm("¿Estás seguro de que deseas registrar esta venta?")) {
       const response = await fetch(`http://localhost:3000/ventas/nuevaVenta`, {
@@ -51,19 +55,23 @@ const RegistrarVenta = () => {
       });
   
       if (response.ok) {
-        selectedProducts.forEach(async (product) => {
+        for (const product of selectedProducts) {
           await fetch(`http://localhost:3000/productos/${product.id}`, {
             method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cantidad: product.cantidad }),
           });
-        });
-  
-        getProductos();
+        }
+          
         alert("¡Venta registrada exitosamente!");
       } else {
         alert("Error al registrar la venta");
       }
     }
   };
+  
 
   const handlerFormInput = (e) => {
     setDataForm({

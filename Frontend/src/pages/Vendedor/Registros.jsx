@@ -45,6 +45,10 @@ const Registros = () => {
         {
             name: "Precio Unitario",
             selector: row => row.precio_unitario
+        },
+        {
+            name: "Cantidad",
+            selector: row => row.cantidad   
         }
     ]
 

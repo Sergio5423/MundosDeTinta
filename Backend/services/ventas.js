@@ -10,7 +10,7 @@ async function getMultiple(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
 
   const ventas = await models.ventas.findAll({
-    attributes: ["id", "fecha", "id_factura"],
+    attributes: ["id", "fecha", "cantidad"],
     include: [
       {
         model: models.empleados,
@@ -21,7 +21,7 @@ async function getMultiple(page = 1) {
         model: models.productos,
         attributes: ["nombre", "precio_unitario"],
         as: "fk_producto",
-      },
+      },      
     ],
     offset: offset,
     limit: config.listPerPage,
@@ -32,11 +32,12 @@ async function getMultiple(page = 1) {
     return {
       id: ventaJSON.id,
       fecha: ventaJSON.fecha,
-      id_factura: ventaJSON.id_factura,
+      //id_factura: ventaJSON.id_factura,
       cedula: ventaJSON.fk_empleados_cedula_empleado.cedula,
       nombreEmpleado: ventaJSON.fk_empleados_cedula_empleado.nombre,
       nombreProducto: ventaJSON.fk_producto.nombre,
       precio_unitario: ventaJSON.fk_producto.precio_unitario,
+      cantidad: ventaJSON.cantidad,
     };
   });
   const meta = { page };
@@ -162,32 +163,32 @@ async function create(ventas) {
   const año = fechaActual.getFullYear();
   const mes = fechaActual.getMonth() + 1;
   const dia = fechaActual.getDate();
-  const fechaFormateada = `${año}-${mes.toString().padStart(2, "0")}-${dia
-    .toString()
-    .padStart(2, "0")}`;
+  const fechaFormateada = `${año}-${mes.toString().padStart(2, "0")}-${dia.toString().padStart(2, "0")}`;
 
-  //let message = "Error al agregar las ventas";
+  let message = "Error al agregar las ventas";
   let ventasCreadas = 0;
 
   try {
     // Verificar los datos de entrada
-    /*if (!Array.isArray(ventas.productos) || !ventas.cedulaEmpleado || !ventas.cedulaCliente || !ventas.facturaId) {
+    if (!Array.isArray(ventas.productos) || !ventas.ced_empleado || !ventas.ced_cliente || !ventas.facturaId) {
       throw new Error("Datos de entrada inválidos");
-    } */
-    for (const productoId of ventas.productos) {
+    }
+
+    for (const producto of ventas.productos) {
       const nuevaVenta = {
         fecha: fechaFormateada,
         fk_empleados_cedula: ventas.ced_empleado,
         ced_cliente: ventas.ced_cliente,
-        id_factura: ventas.facturaId,
-        fk_productos_id: productoId,
+        //id_factura: ventas.facturaId,
+        fk_productos_id: producto.id,
+        cantidad: producto.cantidad
       };
 
       // Agregar mensaje de consola para mostrar nuevaVenta
       console.log("Nueva Venta:", nuevaVenta);
 
-      const result = db.query(`INSERT INTO ventas (fecha,fk_empleados_cedula,fk_productos_id,ced_cliente) VALUES 
-                              ("${fechaFormateada}","${nuevaVenta.fk_empleados_cedula}",${nuevaVenta.fk_productos_id},"${nuevaVenta.ced_cliente}");`);
+      const result = await db.query(`INSERT INTO ventas (fecha, fk_empleados_cedula, fk_productos_id, ced_cliente, cantidad) VALUES 
+                                    ("${fechaFormateada}", "${nuevaVenta.fk_empleados_cedula}", ${nuevaVenta.fk_productos_id}, "${nuevaVenta.ced_cliente}", "${nuevaVenta.cantidad}");`);
       if (result) {
         ventasCreadas++;
       }
@@ -197,12 +198,13 @@ async function create(ventas) {
       message = `${ventasCreadas} ventas agregadas`;
     }
   } catch (error) {
-    //console.error("Error al agregar las ventas", error.message);
-    return /*{ message: error.message }*/;
+    console.error("Error al agregar las ventas", error.message);
+    return { message: error.message };
   }
 
-  return /*{ message }*/;
+  return { message };
 }
+
 
 /*----------------------------------------------*/
 

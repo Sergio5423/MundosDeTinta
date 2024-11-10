@@ -139,50 +139,69 @@ async function create(producto) {
 }*/
 
 /*------------------------------------------------------*/
-async function update(id) {
+/*async function update(id, cantidad) {
+  try {
+    console.log(id);
+    console.log(cantidad);
+    // Busca el producto por id
+    const producto = await models.productos.findOne({
+      where: { id: id } // Usa el id directamente
+    });
+    console.log(producto);
+    // Verifica si el producto existe
+    if (!producto) {
+      return { message: "Producto no encontrado" };
+    }
 
-  const producto = await models.productos.findOne({
-    where: { id: id }
-  });
+    // Verifica si hay suficiente cantidad para actualizar
+    if (producto.cantidad > 0 && producto.cantidad >= cantidad) {
+      producto.cantidad -= cantidad; // Reduce la cantidad
+      await producto.save(); // Guarda los cambios
 
-  if (!producto) {
-    return { message: "Producto no encontrado" };
-  }
-
-
-  if (producto.cantidad > 0) {
-
-    producto.cantidad -= 1;
-    await producto.save();
-
-    return { message: "Producto actualizado" };
-  } else {
+      return { message: "Producto actualizado" };
+    } else {
+      return { message: "Cantidad insuficiente para actualizar el producto" };
+    }
+  } catch (error) {
+    console.error("Error al actualizar el producto", error.message);
     return { message: "Error al actualizar el producto" };
   }
-}
+}*/
+
+
 
 /*------------------------------------------------------*/
 
-/*async function update(id) {
-  let data = await db.query(
-    `SELECT cantidad FROM productos WHERE id=${id}`
-  );  
-  let valor = data[0].cantidad  
-  if (valor > 0) {
+async function update(id, cantidad) {
+  
+  console.log("Cantidad Servicio: ",cantidad);
+
+  // Obtener la cantidad actual del producto
+  let data = await db.query(`SELECT cantidad FROM productos WHERE id=${id}`);
+  
+  // Verificar si el producto existe
+  if (data.length === 0) {
+    return { message: "Producto no encontrado" };
+  }
+
+  let valor = data[0].cantidad;
+  
+  // Verificar si hay suficiente cantidad para actualizar
+  if (valor > 0 && valor >= cantidad) {
     const result = await db.query(
       `UPDATE productos 
-      SET cantidad=cantidad-1
-      WHERE id=${id};`
+       SET cantidad=cantidad-${cantidad}
+       WHERE id=${id};`
     );
 
-    message = "Producto actualizado";
-
+    let message = "Producto actualizado";
     return { message };
   } else {
-    let message = "Error al actualizar el producto";
+    let message = "Cantidad insuficiente para actualizar el producto";
     return { message };
   }
-}*/
+}
+
 
 /*-------------------------------------------------------------------*/
 async function remove(id) {
