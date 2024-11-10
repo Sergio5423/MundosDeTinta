@@ -15,6 +15,7 @@
 #contenedor1 {
     position: relative; 
     background-color: rgb(217, 217, 217);
+    padding: 1%;
     margin-top: 40px;
     min-height: 500px;
     min-width: 1210px;
@@ -59,9 +60,9 @@ input{
     display: flex;
     justify-content: space-between;
     align-items: center;    
-    position: absolute;
+    position: fixed;
     bottom: 25px;
-    right: 25px;    
+    right: 25px;          
 }
 
 #btn-Inf{
@@ -72,5 +73,5 @@ input{
     border-radius: 20%;
     background-color: rgb(79, 81, 82);
     width: 40px;
-    height: 40px;    
+    height: 40px;       
 }

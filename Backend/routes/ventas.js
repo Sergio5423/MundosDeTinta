@@ -43,14 +43,16 @@ router.get('/MasVendidos', async function(req, res, next) {
 });
 
 /*POST*/
-router.post('/nuevaVenta/:id', async function(req, res, next) {
+router.post('/nuevaVenta', async function(req, res, next) {
   try {
-    res.json(await ventas.create(req.params.id,req.body));
+    const result = await ventas.create(req.body);
+    res.json(result);
   } catch (err) {
-    console.error(`Error al agregar la venta`, err.message);
-    next(err);
+    //console.error(`Error al agregar la venta`, err.message);
+    //res.status(500).send(err.message);
   }
 });
+
 
 /* PUT */
 router.put('/:id', async function(req, res, next) {

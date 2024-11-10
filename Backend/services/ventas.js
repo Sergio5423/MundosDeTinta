@@ -157,7 +157,7 @@ async function getMasVendidos(page = 1) {
 }
 
 /*----------------------------------------------*/
-async function create(id, venta) {
+async function create(ventas) {
   const fechaActual = new Date();
   const año = fechaActual.getFullYear();
   const mes = fechaActual.getMonth() + 1;
@@ -166,29 +166,45 @@ async function create(id, venta) {
     .toString()
     .padStart(2, "0")}`;
 
-  const nuevaVenta = {
-    fecha: fechaFormateada,
-    fk_empleados_cedula: venta.cedula,
-    id_factura: venta.facturaId,
-    fk_productos_id: id
-  };
-
-  let message = "Error al agregar la venta";
+  //let message = "Error al agregar las ventas";
+  let ventasCreadas = 0;
 
   try {
-    const result = await models.ventas.create(nuevaVenta);
-    if (result) {
-      message = "Venta agregada";
+    // Verificar los datos de entrada
+    /*if (!Array.isArray(ventas.productos) || !ventas.cedulaEmpleado || !ventas.cedulaCliente || !ventas.facturaId) {
+      throw new Error("Datos de entrada inválidos");
+    } */
+    for (const productoId of ventas.productos) {
+      const nuevaVenta = {
+        fecha: fechaFormateada,
+        fk_empleados_cedula: ventas.ced_empleado,
+        ced_cliente: ventas.ced_cliente,
+        id_factura: ventas.facturaId,
+        fk_productos_id: productoId,
+      };
+
+      // Agregar mensaje de consola para mostrar nuevaVenta
+      console.log("Nueva Venta:", nuevaVenta);
+
+      const result = db.query(`INSERT INTO ventas (fecha,fk_empleados_cedula,fk_productos_id,ced_cliente) VALUES 
+                              ("${fechaFormateada}","${nuevaVenta.fk_empleados_cedula}",${nuevaVenta.fk_productos_id},"${nuevaVenta.ced_cliente}");`);
+      if (result) {
+        ventasCreadas++;
+      }
+    }
+
+    if (ventasCreadas > 0) {
+      message = `${ventasCreadas} ventas agregadas`;
     }
   } catch (error) {
-    console.error(error);
+    //console.error("Error al agregar las ventas", error.message);
+    return /*{ message: error.message }*/;
   }
 
-  return { message };
+  return /*{ message }*/;
 }
 
 /*----------------------------------------------*/
-
 
 /*async function create(id, venta) {
   const fechaActual = new Date();
@@ -233,7 +249,7 @@ async function create(id, venta) {
 /*---------------------------------------------------------*/
 async function remove(id) {
   const result = await models.ventas.destroy({
-    where: { id: id }
+    where: { id: id },
   });
 
   let message = "Error al eliminar la venta";

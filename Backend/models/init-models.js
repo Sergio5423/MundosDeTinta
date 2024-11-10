@@ -31,7 +31,7 @@ function initModels(sequelize) {
     empleados,
     productos,
     usuarios,
-    ventas,
+    ventas,    
   };
 }
 module.exports = initModels;

@@ -30,7 +30,11 @@ module.exports = function(sequelize, DataTypes) {
     id_factura: {
       type: DataTypes.STRING(20),
       allowNull: true
-    }
+    },
+    /*ced_empleado: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },*/
   }, {
     sequelize,
     tableName: 'ventas',
@@ -56,6 +60,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "fk_productos_id" },
+        ]
+      },
+      {
+        name: "ced_cliente",
+        using: "BTREE",
+        fields: [
+          { name: "ced_cliente" },
         ]
       },
     ]

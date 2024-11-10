@@ -7,11 +7,8 @@ import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, LinearScale, CategoryScale, BarController, BarElement, PieController, ArcElement } from 'chart.js';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 ChartJS.register(BarController, BarElement, CategoryScale, LinearScale, PieController, ArcElement);
-
 
 let Ingresos;
 
@@ -23,8 +20,8 @@ const Administrador = () => {
     const [pagos, setPagos] = useState([]);
     const [masvendidos, setMasvendidos] = useState([]);
 
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const [fechaInicio, setFechaInicio] = useState("");
+    const [fechaFin, setFechaFin] = useState("");
 
     const getEmpleados = async () => {
         const allEmpleados = await fetch("http://localhost:3000/empleados");
@@ -33,7 +30,8 @@ const Administrador = () => {
     };
 
     const getVentas = async () => {
-        const allVentas = await fetch("http://localhost:3000/ventas");
+        const url = `http://localhost:3000/ventas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+        const allVentas = await fetch(url);
         const ventasJson = await allVentas.json();
         setVentas(ventasJson.data);
     };
@@ -56,20 +54,12 @@ const Administrador = () => {
         Ingresos = ingresosJson.data[0].Ingresos;
     };
 
-    const filterVentasByDate = (ventas, startDate, endDate) => {
-        return ventas.filter((venta) => {
-            const ventaFecha = new Date(venta.fecha);
-            return ventaFecha >= startDate && ventaFecha <= endDate;
-        });
-    };
-
-    const filteredVentas = filterVentasByDate(ventas, startDate, endDate);
-
     const data = {
         labels: masvendidos.map(item => item.ProductoNombre),
         datasets: [
             {
-                data: filteredVentas.map(item => item.vecesvendido), // Usar los datos filtrados
+                //label: '# of Votes',
+                data: masvendidos.map(item => item.vecesvendido),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -105,12 +95,7 @@ const Administrador = () => {
         getIngresos();
         getPagos();
         getMasVendidos();
-    }, []);
-
-    useEffect(() => {
-        const filteredVentas = filterVentasByDate(ventas, startDate, endDate);
-        // Actualizar la gráfica si es necesario
-    }, [startDate, endDate, ventas]);
+    }, [fechaInicio, fechaFin]); // Dependemos de las fechas para actualizar los datos
 
     const columnsEmpleados = [
         {
@@ -196,6 +181,10 @@ const Administrador = () => {
         }
     ];
 
+    const handleDateChange = () => {
+        getVentas();  // Llamamos a la función que obtiene las ventas filtradas por fecha
+    };
+
     return (
         <div>
             <MenuSuperiorAdministrador />
@@ -224,23 +213,6 @@ const Administrador = () => {
                     <p>Ingresos Totales: ${Ingresos}</p>
                 </div>
             </div>
-
-            {/* Sección de Filtro de Fechas */}
-            <div>
-                <label>Fecha de inicio: </label>
-                <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                    dateFormat="yyyy-MM-dd"
-                />
-                <label>Fecha de fin: </label>
-                <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                    dateFormat="yyyy-MM-dd"
-                />
-            </div>
-
             <div id="Panel">
                 <div id="dv-tabla">
                     <h2 id="txt-ventas*-">Ventas</h2>
@@ -261,18 +233,33 @@ const Administrador = () => {
                         paginationPerPage={3}
                     />
                 </div>
-
             </div>
-
             <div id="Panel">
                 <div id="dv">
-                    <h2>Ventas Filtradas</h2>
+                    <h2>Ventas</h2>
                     <Bar data={data} options={options} />
                 </div>
                 <div id="dv">
-                    <h2>Ventas Filtradas</h2>
+                    <h2>Ventas</h2>
                     <Pie id="graph" data={data} options={options} />
                 </div>
+            </div>
+
+            {/* Filtro de fecha debajo de los gráficos */}
+            <div id="fecha-filtro">
+                <label>Fecha Inicio:</label>
+                <input 
+                    type="date" 
+                    value={fechaInicio} 
+                    onChange={(e) => setFechaInicio(e.target.value)} 
+                />
+                <label>Fecha Fin:</label>
+                <input 
+                    type="date" 
+                    value={fechaFin} 
+                    onChange={(e) => setFechaFin(e.target.value)} 
+                />
+                <button onClick={handleDateChange}>Filtrar</button>
             </div>
         </div>
     );

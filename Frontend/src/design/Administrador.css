@@ -113,9 +113,24 @@ h2 {
     background-color: rgb(217, 217, 217);
 }
 
-#Panel input[type="date"] {
-    padding: 5px;
+/* Estilos nuevos para el filtro de fecha */
+#fecha-filtro {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#fecha-filtro label {
+    font-size: 14px;
+    font-weight: bold;
     margin-right: 10px;
+}
+
+#fecha-filtro input {
+    width: 150px;
+    padding: 5px;
+    font-size: 14px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    margin-right: 20px;
 }
