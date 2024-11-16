@@ -145,9 +145,9 @@ async function getPagos(page = 1) {
 async function getMasVendidos(page = 1) {
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT p.id AS ID, p.nombre AS ProductoNombre, v.cantidad FROM ventas v INNER JOIN productos p ON v.fk_productos_id=p.id;`
+    `SELECT p.id AS ID, p.nombre AS ProductoNombre, COUNT(p.id) AS vecesvendido FROM ventas v INNER JOIN productos p ON v.fk_productos_id=p.id 
+    GROUP BY ProductoNombre, ID ORDER BY COUNT(p.id) DESC;`
   );
-  console.log(rows);
   const data = helper.emptyOrRows(rows);
   const meta = { page };
 

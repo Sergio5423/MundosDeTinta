@@ -5,7 +5,7 @@
     right: 0;
     top: 0;
     border: 2px solid rgb(0, 0, 0);
-    background-color: rgb(217, 217, 217);    
+    background-color: rgb(217, 217, 217);
 }
 
 #botones {
@@ -14,14 +14,10 @@
     top: 0;
 }
 
-#selector {
-    width: 100px;
-}
-
 #Nombre {
     position: absolute;
-    top: 0;    
-    padding-left: 190px;    
+    top: 0;
+    padding-left: 170px;
 }
 
 #btn-departamentos {    
@@ -137,9 +133,4 @@ h2 {
     border-radius: 5px;
     border: 1px solid #ccc;
     margin-right: 20px;
-}
-
-.pie-chart {
-    width: 800px !important; /* Ajusta el tamaño de la gráfica */
-    height: 800px !important; /* Ajusta el tamaño de la gráfica */
 }
