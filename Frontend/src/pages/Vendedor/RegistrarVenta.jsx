@@ -16,6 +16,7 @@ const RegistrarVenta = () => {
   const [dataForm, setDataForm] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedQuantities, setSelectedQuantities] = useState({});
+  const [searchTerm, setSearchTerm] = useState(""); // Nuevo estado para búsqueda
 
   const getProductos = async () => {
     const allProductos = await fetch("http://localhost:3000/productos");
@@ -28,7 +29,7 @@ const RegistrarVenta = () => {
     const { cedulaEmpleado, cedulaCliente } = dataForm;
     const selectedProducts = selectedRows.map((row) => ({
       id: row.id,
-      cantidad: selectedQuantities[row.id] || 1, // Default to 1 if no quantity selected
+      cantidad: selectedQuantities[row.id] || 1,
     }));
 
     if (!cedulaEmpleado || !cedulaCliente || selectedProducts.length === 0) {
@@ -54,10 +55,8 @@ const RegistrarVenta = () => {
         body: JSON.stringify(payload),
       });
 
-      let allUpdatesSuccess = true;
-      let updateMessages = [];
-
-      const updateResponse = await fetch(`http://localhost:3000/productos/actualizar`,
+      const updateResponse = await fetch(
+        `http://localhost:3000/productos/actualizar`,
         {
           method: "PUT",
           headers: {
@@ -68,12 +67,12 @@ const RegistrarVenta = () => {
       );
 
       getProductos();
-      if (allUpdatesSuccess) {
-        alert(`¡Venta registrada exitosamente!\n${updateMessages.join("\n")}`);
+      if (response.ok && updateResponse.ok) {
+        alert("¡Venta registrada exitosamente!");
+      } else {
+        const result = await response.json();
+        alert(`Error al registrar la venta: ${result.message}`);
       }
-
-      const result = await response.json();
-      alert(`Error al registrar la venta: ${result.message}`);
     }
   };
 
@@ -105,6 +104,14 @@ const RegistrarVenta = () => {
     });
   };
 
+  // Filtrar productos según el término de búsqueda
+  const filteredProductos = productos.filter(
+    (producto) =>
+      producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      producto.categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      producto.id.toString().includes(searchTerm)
+  );
+
   const columns = [
     {
       name: "Id",
@@ -118,6 +125,7 @@ const RegistrarVenta = () => {
       name: "Cantidad",
       cell: (row) => (
         <input
+          id="selector"
           type="number"
           min="1"
           value={selectedQuantities[row.id] || 1}
@@ -165,23 +173,12 @@ const RegistrarVenta = () => {
                   placeholder="Cédula Cliente"
                 />
                 <input
-                  id="tb-Buscar"
+                  id="tb-BuscarVentas"
                   type="text"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                />
-                <button id="btn-Buscar" type="button">
-                  <FontAwesomeIcon
-                    icon={faMagnifyingGlass}
-                    style={{ color: "#dce1e5" }}
-                  />
-                </button>
-                <button id="btn-Inf" type="button">
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    style={{ color: "#dce1e5" }}
-                  />
-                </button>
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar productos..."
+                />        
               </div>
             </div>
 
@@ -189,7 +186,7 @@ const RegistrarVenta = () => {
               id="tabla"
               className="custom-table"
               columns={columns}
-              data={productos}
+              data={filteredProductos} // Se usa el arreglo filtrado
               pagination
               paginationPerPage={10}
               selectableRows
